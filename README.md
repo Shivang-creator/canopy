@@ -6,7 +6,7 @@ unfabricated environmental data.**
 Built for **OregonHacks 2026** — prompt: *"Build technology that helps people
 reconnect with nature or supports environmental health."*
 
-Live: _add the deployed URL here after `vercel --prod`_
+Live: https://canopy-jade-zeta.vercel.app (verified returning HTTP 200 on a signed-out request)
 
 ---
 

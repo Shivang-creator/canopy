@@ -39,8 +39,14 @@ export function haversineMeters(
  * than one (rare, but OSM data is messy). */
 function classify(tags: Record<string, string>): { kind: GreenSpaceKind; rawTag: string } | null {
   if (tags.leisure === "nature_reserve") return { kind: "nature_reserve", rawTag: "leisure=nature_reserve" };
-  if (tags.boundary === "protected_area") return { kind: "protected_area", rawTag: "boundary=protected_area" };
   if (tags.boundary === "national_park") return { kind: "protected_area", rawTag: "boundary=national_park" };
+  // boundary=protected_area alone is ambiguous — OSM also uses it for
+  // heritage/cultural protection with zero nature content (e.g. a
+  // National-Register-listed courthouse). Real protected nature areas
+  // carry an IUCN protect_class tag alongside it; only count it then.
+  if (tags.boundary === "protected_area" && tags.protect_class) {
+    return { kind: "protected_area", rawTag: "boundary=protected_area" };
+  }
   if (tags.leisure === "garden") return { kind: "garden", rawTag: "leisure=garden" };
   if (tags.leisure === "park") return { kind: "park", rawTag: "leisure=park" };
   if (tags.landuse === "forest") return { kind: "forest", rawTag: "landuse=forest" };

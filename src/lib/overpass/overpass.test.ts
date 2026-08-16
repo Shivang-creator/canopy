@@ -18,6 +18,17 @@ describe("buildGreenSpaceQuery", () => {
     expect(q).toContain("around:3000,45.5,-122.6"); // 1.5x, capped at 50km
   });
 
+  it("requires protect_class for boundary=protected_area but not for national_park", () => {
+    // Regression guard for the Pioneer Courthouse false-positive (see
+    // parse.test cases): boundary=protected_area alone is ambiguous in
+    // OSM (heritage sites use it too), so it must be gated on
+    // protect_class in the query itself, not just in the parser.
+    const q = buildGreenSpaceQuery({ lat: 45.5, lon: -122.6 });
+    expect(q).toContain('way["boundary"="national_park"]');
+    expect(q).toContain('way["boundary"="protected_area"]["protect_class"]');
+    expect(q).not.toContain('boundary"~"^(national_park|protected_area)');
+  });
+
   it("caps the widened radius at 50km even for a huge input radius", () => {
     const q = buildGreenSpaceQuery({ lat: 45.5, lon: -122.6, radiusMeters: 40000 });
     expect(q).toContain("around:50000,45.5,-122.6");
@@ -120,6 +131,39 @@ describe("parseGreenSpaces", () => {
     };
     expect(() => parseGreenSpaces(raw, center)).not.toThrow();
     expect(parseGreenSpaces(raw, center)).toHaveLength(0);
+  });
+
+  it("excludes a heritage protected_area with no nature content (regression: Pioneer Courthouse)", () => {
+    // Found during manual QA against a real Portland, OR query: a federal
+    // courthouse carries boundary=protected_area for its National
+    // Register of Historic Places status, with no protect_class tag. A
+    // real protected NATURE area (e.g. Washington Park) carries
+    // protect_class alongside boundary=protected_area.
+    const raw: RawOverpassResponse = {
+      elements: [
+        {
+          type: "way",
+          id: 1,
+          center: { lat: 45.5147, lon: -122.6793 },
+          tags: {
+            boundary: "protected_area",
+            amenity: "courthouse",
+            building: "office",
+            heritage: "2",
+            protection_title: "protected_site",
+            name: "Pioneer Courthouse",
+          },
+        },
+        {
+          type: "relation",
+          id: 2,
+          center: { lat: 45.52, lon: -122.71 },
+          tags: { boundary: "protected_area", protect_class: "5", name: "Washington Park" },
+        },
+      ],
+    };
+    const spaces = parseGreenSpaces(raw, center);
+    expect(spaces.map((s) => s.name)).toEqual(["Washington Park"]);
   });
 
   it("ignores elements whose tags don't match any tracked green-space kind", () => {

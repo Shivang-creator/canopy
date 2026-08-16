@@ -64,8 +64,17 @@ export function buildGreenSpaceQuery({
     `way["landuse"~"^(forest|recreation_ground)$"](${around});`,
     `relation["landuse"~"^(forest|recreation_ground)$"](${around});`,
     `way["natural"="wood"](${around});`,
-    `way["boundary"~"^(national_park|protected_area)$"](${wideAround});`,
-    `relation["boundary"~"^(national_park|protected_area)$"](${wideAround});`,
+    // boundary=national_park is unambiguous on its own. boundary=protected_area
+    // is not: OSM also uses it for heritage/cultural protection boundaries
+    // with no nature content at all (found during manual QA: a courthouse
+    // building in Portland carries boundary=protected_area for its National
+    // Register of Historic Places status). Real protected NATURE areas carry
+    // an IUCN protect_class tag alongside it; heritage boundaries don't. So
+    // protected_area is only queried together with protect_class present.
+    `way["boundary"="national_park"](${wideAround});`,
+    `relation["boundary"="national_park"](${wideAround});`,
+    `way["boundary"="protected_area"]["protect_class"](${wideAround});`,
+    `relation["boundary"="protected_area"]["protect_class"](${wideAround});`,
   ];
 
   return `[out:json][timeout:${timeoutSeconds}];\n(\n  ${clauses.join("\n  ")}\n);\nout center tags;`;

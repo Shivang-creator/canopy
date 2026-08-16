@@ -26,7 +26,11 @@ const ENDPOINTS = [
 ] as const;
 
 const USER_AGENT = "Canopy-Hackathon/0.1 (OregonHacks; green-space lookup)";
-const FETCH_TIMEOUT_MS = 20000;
+// Two endpoints are tried in sequence (see fetchGreenSpaces below), and
+// the whole request has to fit inside the API route's function budget
+// (maxDuration = 30s in route.ts) with room to spare for parsing and the
+// fallback path — so each individual attempt gets well under half of it.
+const FETCH_TIMEOUT_MS = 12000;
 
 async function postOverpass(endpoint: string, query: string): Promise<RawOverpassResponse> {
   const controller = new AbortController();

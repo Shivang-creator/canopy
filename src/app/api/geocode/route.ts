@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { geocodePlace } from "@/lib/geocode";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 15;
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

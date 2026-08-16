@@ -118,7 +118,8 @@ export function GreenSpacePanel({
 
       {loading && (
         <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
-          Querying OpenStreetMap…
+          Querying OpenStreetMap&hellip; a live public API, so this can take a few seconds (occasionally longer
+          under load — it will fall back honestly rather than hang forever).
         </p>
       )}
 

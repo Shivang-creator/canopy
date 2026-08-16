@@ -142,7 +142,33 @@ export function Dashboard() {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-6">
       {isDemo && <DemoBanner entryCount={entries.length} onStartRealLog={handleStartRealLog} />}
 
-      <QuickEntryForm existing={todayEntry} onSubmit={handleEntrySubmit} />
+      {/*
+        Keyed on mode + date (NOT on todayEntry?.id — see below) so the
+        form's internal state (location, note, category, all initialised
+        once from `existing` and not re-synced on every render) resets
+        exactly when it needs to and no more.
+
+        Caught in QA: without any key, clicking "Start my real log" while
+        today's demo entry was showing left the form's *location* field
+        holding onto the demo place name (its useState initializer had
+        already run against the demo entry before the switch), so a
+        visitor's first real entry could silently inherit demo text they
+        never typed. Keying on mode+date fixes that: demo -> real changes
+        the key, forcing a fresh mount with existing=null.
+
+        Keying on todayEntry?.id instead was tried first and reverted: an
+        id-based key also changes the instant a submit succeeds (no entry
+        -> a real id), forcing an unwanted remount immediately after
+        saving and silently swallowing the "saved" confirmation and the
+        just-typed field values. Mode+date doesn't change on submit, so
+        editing today's entry again keeps the same instance, which is the
+        behavior you want.
+      */}
+      <QuickEntryForm
+        key={`${isDemo ? "demo" : "real"}:${todayKey()}`}
+        existing={todayEntry}
+        onSubmit={handleEntrySubmit}
+      />
 
       <SignalPanel result={result} />
 

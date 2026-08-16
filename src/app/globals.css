@@ -1,26 +1,148 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ------------------------------------------------------------------ */
+/* Design tokens                                                       */
+/* ------------------------------------------------------------------ */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  /* Ground: warm paper, like a field journal, not a SaaS dashboard. */
+  --bg: #f5f1e8;
+  --bg-raised: #fffdf8;
+  --bg-sunken: #ece6d8;
+
+  --ink: #1e2b22;
+  --ink-muted: #57685a;
+  --ink-faint: #8a978b;
+
+  /* Canopy green — the primary color, deep enough to read as "forest",
+     not "mint SaaS". */
+  --canopy: #2f4b3c;
+  --canopy-strong: #1f382b;
+  --canopy-bright: #4b7a5a;
+  --canopy-wash: #e3ebe2;
+
+  /* Lichen amber — the one warm accent, used sparingly for calls to
+     action and "moderate" signal strength. */
+  --amber: #b9791f;
+  --amber-wash: #f4e6cc;
+
+  /* Bark — tertiary, used only in the tree-ring signature. */
+  --bark: #7a5738;
+
+  /* Rust — reserved for "insufficient data" / honesty flags. Earthy, not
+     alarm-red. */
+  --rust: #a24a35;
+  --rust-wash: #f3ddd4;
+
+  --border: #ddd4bf;
+  --border-strong: #c3b89e;
+
+  --shadow: 0 1px 2px rgba(30, 43, 34, 0.06), 0 8px 24px -12px rgba(30, 43, 34, 0.18);
+
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-body: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg: #12180f;
+    --bg-raised: #1a2318;
+    --bg-sunken: #0d120b;
+
+    --ink: #eef0e6;
+    --ink-muted: #a9b6a2;
+    --ink-faint: #6f7c6c;
+
+    --canopy: #7fb590;
+    --canopy-strong: #9bcaa8;
+    --canopy-bright: #5f9a71;
+    --canopy-wash: #1c2c22;
+
+    --amber: #e0a94f;
+    --amber-wash: #34281a;
+
+    --bark: #b08e6b;
+
+    --rust: #e08469;
+    --rust-wash: #3a241d;
+
+    --border: #2b3527;
+    --border-strong: #3d4a38;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
   }
 }
 
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-raised: var(--bg-raised);
+  --color-bg-sunken: var(--bg-sunken);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-canopy: var(--canopy);
+  --color-canopy-strong: var(--canopy-strong);
+  --color-canopy-bright: var(--canopy-bright);
+  --color-canopy-wash: var(--canopy-wash);
+  --color-amber: var(--amber);
+  --color-amber-wash: var(--amber-wash);
+  --color-bark: var(--bark);
+  --color-rust: var(--rust);
+  --color-rust-wash: var(--rust-wash);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-data);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  color-scheme: light dark;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+::selection {
+  background: var(--canopy-wash);
+  color: var(--canopy-strong);
+}
+
+:focus-visible {
+  outline: 2px solid var(--canopy-bright);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-data {
+  font-family: var(--font-data);
+}
+
+/* A soft grain of texture behind raised cards — bark-like, not decoration
+   for its own sake. Extremely subtle. */
+.bg-grain {
+  background-image: radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
+  background-size: 18px 18px;
 }

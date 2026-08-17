@@ -33,7 +33,10 @@ export interface GreenSpaceQueryOptions {
 }
 
 const DEFAULT_RADIUS_METERS = 2000;
-const DEFAULT_TIMEOUT_SECONDS = 25;
+// Deliberately below the client's own abort (22s, see client.ts) so a slow
+// area comes back as a real Overpass timeout we can report, rather than an
+// aborted fetch we can only guess about.
+const DEFAULT_TIMEOUT_SECONDS = 20;
 
 export function buildGreenSpaceQuery({
   lat,

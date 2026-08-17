@@ -26,11 +26,16 @@ const ENDPOINTS = [
 ] as const;
 
 const USER_AGENT = "Canopy-Hackathon/0.1 (OregonHacks; green-space lookup)";
-// Two endpoints are tried in sequence (see fetchGreenSpaces below), and
-// the whole request has to fit inside the API route's function budget
-// (maxDuration = 30s in route.ts) with room to spare for parsing and the
-// fallback path — so each individual attempt gets well under half of it.
-const FETCH_TIMEOUT_MS = 12000;
+// Two endpoints are tried in sequence (see fetchGreenSpaces below) inside the
+// route's 60s budget, so each attempt gets 22s and there is room left for
+// parsing and the fallback path.
+//
+// This has to stay LONGER than the [timeout:N] we hand Overpass itself
+// (20s, see query.ts). If we abort first, the server never gets to answer and
+// the user sees "operation was aborted" instead of a real result. That is
+// exactly what happened for dense cities: a 12s client abort against a query
+// the server had been told could take 25s.
+const FETCH_TIMEOUT_MS = 22000;
 
 async function postOverpass(endpoint: string, query: string): Promise<RawOverpassResponse> {
   const controller = new AbortController();

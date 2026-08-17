@@ -36,7 +36,7 @@ describe("buildGreenSpaceQuery", () => {
 
   it("defaults to a sensible radius and timeout when omitted", () => {
     const q = buildGreenSpaceQuery({ lat: 0, lon: 0 });
-    expect(q).toContain("[timeout:25]");
+    expect(q).toContain("[timeout:20]");
     expect(q).toContain("around:2000,0,0");
   });
 

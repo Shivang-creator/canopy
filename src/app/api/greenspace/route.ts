@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 // tries a primary endpoint then a mirror before falling back — raise the
 // function budget above Vercel's 10s default so a slow-but-real live
 // answer isn't cut off and replaced by the fallback prematurely.
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

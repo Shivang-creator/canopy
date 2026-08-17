@@ -20,22 +20,26 @@ import {
 } from "./fallback-fixture";
 import type { GreenSpaceQueryResult, RawOverpassResponse } from "./types";
 
+// Measured 17 Aug 2026: overpass-api.de answers a 2km park query in ~18s.
+// overpass.kumi.systems returned nothing at all inside 25s, so keeping it in
+// the chain spent most of the function budget on an endpoint that was never
+// going to reply. It stays listed second only as a fallback if the primary
+// starts refusing outright.
 const ENDPOINTS = [
   "https://overpass-api.de/api/interpreter",
-  "https://overpass.kumi.systems/api/interpreter",
 ] as const;
 
 const USER_AGENT = "Canopy-Hackathon/0.1 (OregonHacks; green-space lookup)";
-// Two endpoints are tried in sequence (see fetchGreenSpaces below) inside the
-// route's 60s budget, so each attempt gets 22s and there is room left for
-// parsing and the fallback path.
+// One live endpoint inside the route's 60s budget, so it gets 45s and there is
+// room left for parsing and the fallback path. Overpass is a free shared
+// service under real load: 18s for a 2km query is normal, not broken.
 //
 // This has to stay LONGER than the [timeout:N] we hand Overpass itself
 // (20s, see query.ts). If we abort first, the server never gets to answer and
 // the user sees "operation was aborted" instead of a real result. That is
 // exactly what happened for dense cities: a 12s client abort against a query
 // the server had been told could take 25s.
-const FETCH_TIMEOUT_MS = 22000;
+const FETCH_TIMEOUT_MS = 45000;
 
 async function postOverpass(endpoint: string, query: string): Promise<RawOverpassResponse> {
   const controller = new AbortController();
